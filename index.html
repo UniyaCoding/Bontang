@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uniya</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: lightblue;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            font-size: 48px;
+            color: red;
+            font-weight: bold;
+            margin: 20px 0; /* Spacing for header */
+        }
+        .container {
+            background: white;
+            padding: 20px; /* Padding around the container */
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 300px; /* Fixed width */
+            text-align: center;
+            margin-bottom: 20px; /* Spacing between containers */
+        }
+        h2 {
+            margin-bottom: 15px; /* Spacing for headings */
+        }
+        input, button {
+            width: calc(100% - 20px); /* Subtracting padding from full width */
+            padding: 10px; /* Padding for input and button */
+            margin: 10px 0; /* Margin for spacing */
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box; /* Ensures padding is included in width */
+        }
+        .dashboard-container {
+            display: none; /* Hide dashboard initially */
+        }
+        .welcome-message {
+            margin: 10px 0;
+        }
+        .button {
+            background-color: #a9c52b;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .course-card {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 8px;
+            background-color: white;
+            width: 300px; /* Same width as login container */
+        }
+        .button-container {
+            display: inline-block;
+            border: 1px solid #a9c52b;
+            border-radius: 4px;
+            background-color: #a9c52b;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .button-container:hover {
+            background-color: #8cae2b;
+        }
+        .circle-option {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 2px solid #a9c52b;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 50px;
+            margin: 5px;
+            cursor: pointer;
+            background-color: white;
+        }
+        .circle-option.locked {
+            color: red;
+            font-weight: bold;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .close-button {
+            cursor: pointer;
+            color: red;
+            margin-top: 10px;
+        }
+        .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 24px;
+            cursor: pointer;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Uniya</h1>
+</header>
+
+<div class="container" id="login">
+    <h2>Login</h2>
+    <input type="text" placeholder="NIM" id="nim" required>
+    <input type="password" placeholder="Kata Sandi" id="password" required>
+    <button onclick="login()">Login</button>
+</div>
+
+<div class="container dashboard-container" id="dashboard" style="display: none;">
+    <span class="close-btn" onclick="logout()">✖</span>
+    <h2>Dashboard</h2>
+    <div class="welcome-message">
+        <p>Selamat Datang Kembali, <span id="username">Pengguna</span>!</p>
+    </div>
+    <button class="button" onclick="showCourses()">Lihat Kursus Tersedia</button>
+</div>
+
+<main id="courses" style="display: none;">
+    <section class="courses">
+        <h2>Kursus Tersedia</h2>
+        <div class="course-card">
+            <h3>ALGORITMA & GAME 3D</h3>
+            <a href="#" class="button-container" onclick="showOptions(1)">Mulai Belajar</a>
+        </div>
+        <div class="course-card">
+            <h3>WEBSITE</h3>
+            <a href="#" class="button-container" onclick="showOptions(2)">Mulai Belajar</a>
+        </div>
+        <div class="course-card">
+            <h3>VIRTUAL WORLD MAKER</h3>
+            <a href="#" class="button-container" onclick="showOptions(3)">Mulai Belajar</a>
+        </div>
+        <div class="course-card">
+            <h3>LITTLE PROGRAMMER</h3>
+            <a href="#" class="button-container" onclick="showOptions(4)">Mulai Belajar</a>
+        </div>
+        <div class="course-card">
+            <h3>GAME CODER CLUB</h3>
+            <a href="#" class="button-container" onclick="showOptions(5)">Mulai Belajar</a>
+        </div>
+    </section>
+
+    <div class="modal" id="optionsModal">
+        <div class="modal-content">
+            <h3>Pilih Kolom untuk Kursus <span id="courseNumber"></span>:</h3>
+            <div id="circleOptions"></div>
+            <span class="close-button" onclick="closeModal()">Tutup</span>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; Uniya</p>
+</footer>
+
+<script>
+    const validAccounts = [
+        { nim: "20240522", password: "20240522" },
+        { nim: "20240523", password: "20240523" },
+        { nim: "20240524", password: "20240524" },
+        { nim: "20240525", password: "20240525" },
+        { nim: "20240526", password: "20240526" },
+        { nim: "20240527", password: "20240527" },
+        { nim: "20240528", password: "20240528" },
+        { nim: "20240529", password: "20240529" },
+        { nim: "20240540", password: "20240540" }
+    ];
+
+    function login() {
+        const nim = document.getElementById('nim').value;
+        const password = document.getElementById('password').value;
+
+        const account = validAccounts.find(acc => acc.nim === nim && acc.password === password);
+        if (account) {
+            document.getElementById('login').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('username').textContent = nim;
+        } else {
+            alert('NIM atau kata sandi salah!');
+        }
+    }
+
+    function logout() {
+        document.getElementById('dashboard').style.display = 'none';
+        document.getElementById('login').style.display = 'block';
+        document.getElementById('courses').style.display = 'none';
+        document.getElementById('nim').value = '';
+        document.getElementById('password').value = '';
+    }
+
+    function showCourses() {
+        document.getElementById('dashboard').style.display = 'none';
+        document.getElementById('courses').style.display = 'block';
+    }
+
+    function showOptions(course) {
+        const modal = document.getElementById('optionsModal');
+        const circleOptions = document.getElementById('circleOptions');
+        circleOptions.innerHTML = ''; // Reset isi kolom
+        document.getElementById('courseNumber').textContent = course;
+
+        // Buat kolom bulat dari 1 hingga 16 untuk kursus 1 (ALGORITMA) dan 12 untuk kursus 2 (WEBSITE)
+        const totalOptions = course === 1 ? 16 : 12;
+        const passwords = course === 1 
+            ? ['03', '42', '22', '34', '12', '08', '90', '11', '17', '33', '20', '34', '89', '72', '44']
+            : ['17', '23', '49', '33', '20', '48', '21', '30', '84', '67', '88', '41'];
+
+        for (let i = 1; i <= totalOptions; i++) {
+            const circle = document.createElement('div');
+            circle.className = 'circle-option locked';
+            circle.textContent = `${i} (Kunci)`;
+            circle.onclick = () => unlockOption(i, passwords[i - 1], course);
+            circleOptions.appendChild(circle);
+        }
+
+        modal.style.display = 'flex'; // Tampilkan modal
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('optionsModal');
+        modal.style.display = 'none'; // Sembunyikan modal
+    }
+
+    function unlockOption(number, correctPassword, course) {
+        const password = prompt("Masukkan kode untuk membuka akses:");
+
+        if (password === correctPassword) {
+            alert(`Akses untuk kolom ${number} telah dibuka!`);
+            selectOption(course, number, correctPassword); // Panggil fungsi untuk memilih opsi
+        } else {
+            alert('Kode salah! Akses tetap terkunci.');
+        }
+    }
+
+    function selectOption(course, number, password) {
+        let url;
+        switch (course) {
+            case 1: // ALGORITMA
+                switch (number) {
+                    case 1: url = 'http://127.0.0.1:5500/1A3D.html'; break;
+                    case 2: url = 'http://127.0.0.1:5500/2A3D.html'; break;
+                    case 3: url = 'http://example.com/3'; break;
+                    case 4: url = 'http://example.com/4'; break;
+                    case 5: url = 'http://example.com/5'; break;
+                    case 6: url = 'http://example.com/6'; break;
+                    case 7: url = 'http://example.com/7'; break;
+                    case 8: url = 'http://example.com/8'; break;
+                    case 9: url = 'http://example.com/9'; break;
+                    case 10: url = 'http://example.com/10'; break;
+                    case 11: url = 'http://example.com/11'; break;
+                    case 12: url = 'http://example.com/12'; break;
+                    case 13: url = 'http://example.com/13'; break;
+                    case 14: url = 'http://example.com/14'; break;
+                    case 15: url = 'http://example.com/15'; break;
+                    case 16: url = 'http://example.com/16'; break;
+                    default: alert('URL tidak ditentukan untuk kolom ini.'); return;
+                }
+                break;
+            case 2: // WEBSITE
+                switch (number) {
+                    case 1: url = 'http://example.com/1'; break;
+                    case 2: url = 'http://example.com/2'; break;
+                    case 3: url = 'http://example.com/3'; break;
+                    case 4: url = 'http://example.com/4'; break;
+                    case 5: url = 'http://example.com/5'; break;
+                    case 6: url = 'http://example.com/6'; break;
+                    case 7: url = 'http://example.com/7'; break;
+                    case 8: url = 'http://example.com/8'; break;
+                    case 9: url = 'http://example.com/9'; break;
+                    case 10: url = 'http://example.com/10'; break;
+                    case 11: url = 'http://example.com/11'; break;
+                    case 12: url = 'http://example.com/12'; break;
+                    default: alert('URL tidak ditentukan untuk kolom ini.'); return;
+                }
+                break;
+            default:
+                alert('Kursus tidak ditemukan.');
+                return;
+        }
+        window.location.href = url; // Arahkan ke URL yang ditentukan
+    }
+</script>
+
+</body>
+</html>
